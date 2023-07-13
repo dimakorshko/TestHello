@@ -5,7 +5,7 @@ import "github.com/go-martini/martini"
 func main() {
 	m := martini.Classic()
 	m.Get("/", func() string {
-		return "Hello World"
+		return "Hello World AAAAAAAA"
 	})
 	m.Run()
 }
