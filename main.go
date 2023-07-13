@@ -67,7 +67,7 @@ func main() {
 		http.ServeFile(w, r, "account.html")
 	})
 
-	/*http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
 			// Чтение данных из формы
 			err := r.ParseForm()
@@ -132,7 +132,7 @@ func main() {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 	})
 
-	// Обработчик POST запроса на эндпоинт /user
+	/*// Обработчик POST запроса на эндпоинт /user
 	http.HandleFunc("/user", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
 			// Отображение формы для ввода данных пользователя
