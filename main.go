@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -17,6 +18,10 @@ type User struct {
 }
 
 func main() {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080" // Порт по умолчанию, если переменная окружения не установлена
+	}
 	// Подключение к базе данных SQLite
 	db, err := sql.Open("sqlite3", "test.db")
 	if err != nil {
