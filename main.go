@@ -15,6 +15,7 @@ type User struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
+	Phone    string `json:"phone"`
 }
 
 func main() {
@@ -23,9 +24,9 @@ func main() {
 		port = "8080" // Порт по умолчанию, если переменная окружения не установлена
 	}
 
-	/*http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "Hello, World!")
-	})*/
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "form.html")
+	})
 
 	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
@@ -51,13 +52,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/account", func(w http.ResponseWriter, r *http.Request) {
 		// Получение значения куки с именем пользователя
 		cookie, err := r.Cookie("username")
 		if err != nil || cookie.Value == "" {
 			// Если куки не установлено или пустое значение, перенаправляем на форму авторизации
-			//http.Redirect(w, r, "/form.html", http.StatusFound)
-			http.ServeFile(w, r, "form.html")
+			http.Redirect(w, r, "/form.html", http.StatusFound)
 			return
 		}
 
@@ -65,10 +65,6 @@ func main() {
 		username := cookie.Value
 		fmt.Println(username)
 		// Отображение страницы аккаунта
-		http.ServeFile(w, r, "account.html")
-	})
-
-	http.HandleFunc("/account", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "account.html")
 	})
 
