@@ -1,9 +1,9 @@
 package main
 
 import (
-	"database/sql"
+	_ "database/sql"
 	"fmt"
-	"log"
+	_ "log"
 	"net/http"
 	"os"
 
@@ -22,7 +22,17 @@ func main() {
 	if port == "" {
 		port = "8080" // Порт по умолчанию, если переменная окружения не установлена
 	}
-	// Подключение к базе данных SQLite
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "Hello, World!")
+	})
+
+	err := http.ListenAndServe(":"+port, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	/*// Подключение к базе данных SQLite
 	db, err := sql.Open("sqlite3", "test.db")
 	if err != nil {
 		log.Fatal(err)
@@ -163,5 +173,5 @@ func main() {
 	})
 
 	// Запуск сервера на порту 8080
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":8080", nil))*/
 }
