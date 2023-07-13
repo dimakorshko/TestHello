@@ -23,9 +23,9 @@ func main() {
 		port = "8080" // Порт по умолчанию, если переменная окружения не установлена
 	}
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	/*http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "Hello, World!")
-	})
+	})*/
 
 	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
@@ -51,7 +51,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	http.HandleFunc("/account", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		// Получение значения куки с именем пользователя
 		cookie, err := r.Cookie("username")
 		if err != nil || cookie.Value == "" {
