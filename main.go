@@ -67,6 +67,10 @@ func main() {
 		http.ServeFile(w, r, "account.html")
 	})
 
+	http.HandleFunc("/account", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "account.html")
+	})
+
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
 			// Чтение данных из формы
