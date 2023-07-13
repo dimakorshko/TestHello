@@ -1,11 +1,18 @@
 package main
 
-import "github.com/go-martini/martini"
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+)
 
 func main() {
-	m := martini.Classic()
-	m.Get("/", func() string {
-		return "Hello World AAAAAAAA"
+	port := os.Getenv("PORT")
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "Hello, World! ")
+		fmt.Fprintf(w, port)
 	})
-	m.Run()
+
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
