@@ -1,9 +1,9 @@
 package main
 
 import (
-	_ "database/sql"
+	"database/sql"
 	"fmt"
-	_ "log"
+	"log"
 	"net/http"
 	"os"
 
@@ -32,7 +32,7 @@ func main() {
 		panic(err)
 	}
 
-	/*// Подключение к базе данных SQLite
+	// Подключение к базе данных SQLite
 	db, err := sql.Open("sqlite3", "test.db")
 	if err != nil {
 		log.Fatal(err)
@@ -51,7 +51,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	http.HandleFunc("/account", func(w http.ResponseWriter, r *http.Request) {
+	/*http.HandleFunc("/account", func(w http.ResponseWriter, r *http.Request) {
 		// Получение значения куки с именем пользователя
 		cookie, err := r.Cookie("username")
 		if err != nil || cookie.Value == "" {
