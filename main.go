@@ -132,7 +132,7 @@ func main() {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 	})
 
-	/*// Обработчик POST запроса на эндпоинт /user
+	// Обработчик POST запроса на эндпоинт /user
 	http.HandleFunc("/user", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
 			// Отображение формы для ввода данных пользователя
@@ -170,7 +170,7 @@ func main() {
 		}
 
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-	})*/
+	})
 
 	// Запуск сервера на порту 8080
 	//log.Fatal(http.ListenAndServe(":8080", nil))
