@@ -56,7 +56,8 @@ func main() {
 		cookie, err := r.Cookie("username")
 		if err != nil || cookie.Value == "" {
 			// Если куки не установлено или пустое значение, перенаправляем на форму авторизации
-			http.Redirect(w, r, "/form.html", http.StatusFound)
+			//http.Redirect(w, r, "/form.html", http.StatusFound)
+			http.ServeFile(w, r, "form.html")
 			return
 		}
 
