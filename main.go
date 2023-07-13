@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -21,12 +22,12 @@ var db *sql.DB
 
 func main() {
 	var err error
-	/*port := os.Getenv("PORT")
+	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080" // Порт по умолчанию, если переменная окружения не установлена
 	}
 
-	err = http.ListenAndServe(":"+port, nil)
+	/*err = http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		panic(err)
 	}*/
