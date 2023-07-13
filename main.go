@@ -27,10 +27,10 @@ func main() {
 		port = "8080" // Порт по умолчанию, если переменная окружения не установлена
 	}
 
-	/*err = http.ListenAndServe(":"+port, nil)
+	err = http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		panic(err)
-	}*/
+	}
 
 	// Открываем соединение с базой данных SQLite3
 
