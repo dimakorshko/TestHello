@@ -2,177 +2,179 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
+	_ "fmt"
+	"html/template"
 	"log"
 	"net/http"
-	"os"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 type User struct {
-	ID       int64  `json:"id"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Phone    string `json:"phone"`
+	ID       int
+	Username string
+	Email    string
+	Password string
 }
 
+var db *sql.DB
+
 func main() {
-	port := os.Getenv("PORT")
+	var err error
+	/*port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080" // Порт по умолчанию, если переменная окружения не установлена
 	}
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "form.html")
-	})
-
-	err := http.ListenAndServe(":"+port, nil)
+	err = http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		panic(err)
-	}
+	}*/
 
-	// Подключение к базе данных SQLite
-	db, err := sql.Open("sqlite3", "test.db")
+	// Открываем соединение с базой данных SQLite3
+
+	db, err = sql.Open("sqlite3", "users.db")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
-	// Создание таблицы пользователей, если она не существует
+	// Создаем таблицу пользователей, если она не существует
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS users (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		username TEXT NOT NULL,
 		email TEXT NOT NULL,
-		password TEXT NOT NULL,
-		phone TEXT NOT NULL
+		password TEXT NOT NULL
 	)`)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	http.HandleFunc("/account", func(w http.ResponseWriter, r *http.Request) {
-		// Получение значения куки с именем пользователя
-		cookie, err := r.Cookie("username")
-		if err != nil || cookie.Value == "" {
-			// Если куки не установлено или пустое значение, перенаправляем на форму авторизации
-			http.Redirect(w, r, "/form.html", http.StatusFound)
-			return
-		}
-
-		// Имя пользователя
-		username := cookie.Value
-		fmt.Println(username)
-		// Отображение страницы аккаунта
-		http.ServeFile(w, r, "account.html")
-	})
-
-	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPost {
-			// Чтение данных из формы
-			err := r.ParseForm()
-			if err != nil {
-				log.Println(err)
-				http.Error(w, "Server Error", http.StatusInternalServerError)
-				return
-			}
-
-			login := r.Form.Get("login")
-			password := r.Form.Get("password")
-
-			// Проверка правильности логина и пароля в базе данных
-			var dbUsername string
-			var dbPassword string
-			var dbEmail string
-			var dbPhone string
-			err = db.QueryRow("SELECT username, password, email, phone FROM users WHERE username = ?", login).Scan(&dbUsername, &dbPassword, &dbEmail, &dbPhone)
-			if err != nil {
-				if err == sql.ErrNoRows {
-					// Неправильный логин
-					http.Redirect(w, r, "/form.html", http.StatusFound)
-					return
-				}
-				log.Println(err)
-				http.Error(w, "Server Error", http.StatusInternalServerError)
-				return
-			}
-
-			if password == dbPassword {
-				// Успешная авторизация
-				cookie := &http.Cookie{
-					Name:  "username",
-					Value: login,
-					Path:  "/",
-				}
-				http.SetCookie(w, cookie)
-
-				emailCookie := &http.Cookie{
-					Name:  "email",
-					Value: dbEmail,
-					Path:  "/",
-				}
-				http.SetCookie(w, emailCookie)
-
-				phoneCookie := &http.Cookie{
-					Name:  "phone",
-					Value: dbPhone,
-					Path:  "/",
-				}
-				http.SetCookie(w, phoneCookie)
-
-				http.Redirect(w, r, "/account", http.StatusFound)
-				return
-			}
-
-			// Неправильный пароль
-			http.Redirect(w, r, "/form.html", http.StatusFound)
-			return
-		}
-
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-	})
-
-	// Обработчик POST запроса на эндпоинт /user
-	http.HandleFunc("/user", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodGet {
-			// Отображение формы для ввода данных пользователя
-			http.ServeFile(w, r, "form.html")
-			return
-		} else if r.Method == http.MethodPost {
-			// Чтение данных из формы
-			err := r.ParseForm()
-			if err != nil {
-				log.Println(err)
-				http.Error(w, "Server Error", http.StatusInternalServerError)
-				return
-			}
-
-			username := r.Form.Get("username")
-			email := r.Form.Get("email")
-			password := r.Form.Get("password")
-			phone := r.Form.Get("phone")
-
-			// Вставка данных в базу данных
-			result, err := db.Exec("INSERT INTO users (username, email, password, phone) VALUES (?, ?, ?, ?)", username, email, password, phone)
-			if err != nil {
-				log.Println(err)
-				http.Error(w, "Server Error", http.StatusInternalServerError)
-				return
-			}
-
-			// Получение идентификатора нового пользователя
-			userID, _ := result.LastInsertId()
-
-			// Отображение сообщения об успешном добавлении пользователя
-			message := fmt.Sprintf("Пользователь успешно добавлен. ID: %d", userID)
-			fmt.Fprintln(w, message)
-			return
-		}
-
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-	})
+	// Регистрация и обработка маршрутов
+	http.HandleFunc("/", homeHandler)
+	http.HandleFunc("/register", registerHandler)
+	http.HandleFunc("/login", loginHandler)
+	http.HandleFunc("/profile", profileHandler)
 
 	// Запуск сервера на порту 8080
-	//log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Println("Server started on http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+func homeHandler(w http.ResponseWriter, r *http.Request) {
+	// Отображение домашней страницы
+	renderTemplate(w, []string{"templates/home.html"}, nil)
+
+}
+
+func registerHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		// Обработка регистрации нового пользователя
+		username := r.FormValue("username")
+		email := r.FormValue("email")
+		password := r.FormValue("password")
+
+		// Проверка, что пользователь с таким именем пользователя не существует
+		existingUser, err := getUserByUsername(username)
+		if err != nil && err != sql.ErrNoRows {
+			http.Error(w, "Server Error", http.StatusInternalServerError)
+			return
+		}
+		if existingUser != nil {
+			http.Error(w, "Username already exists", http.StatusBadRequest)
+			return
+		}
+
+		// Вставка нового пользователя в базу данных
+		_, err = db.Exec("INSERT INTO users (username, email, password) VALUES (?, ?, ?)", username, email, password)
+		if err != nil {
+			http.Error(w, "Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		// Перенаправление на страницу авторизации
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
+
+	// Отображение страницы регистрации
+	renderTemplate(w, []string{"templates/register.html"}, nil)
+}
+
+func loginHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		// Обработка попытки авторизации
+		username := r.FormValue("username")
+		password := r.FormValue("password")
+
+		// Проверка правильности логина и пароля
+		user, err := getUserByUsernameAndPassword(username, password)
+		if err != nil && err != sql.ErrNoRows {
+			http.Error(w, "Server Error", http.StatusInternalServerError)
+			return
+		}
+		if user == nil {
+			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+			return
+		}
+
+		// Создание сессии пользователя (можно использовать куки)
+		// В данном примере просто сохраняем имя пользователя в URL запроса
+		http.Redirect(w, r, "/profile?username="+user.Username, http.StatusFound)
+		return
+	}
+
+	// Отображение страницы авторизации
+	renderTemplate(w, []string{"templates/login.html"}, nil)
+
+}
+
+func profileHandler(w http.ResponseWriter, r *http.Request) {
+	username := r.FormValue("username")
+
+	// Получение пользователя по имени пользователя из базы данных
+	user, err := getUserByUsername(username)
+	if err != nil {
+		http.Error(w, "Server Error", http.StatusInternalServerError)
+		return
+	}
+	if user == nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	// Отображение профиля пользователя
+	renderTemplate(w, []string{"templates/profile.html"}, user)
+
+}
+
+func getUserByUsername(username string) (*User, error) {
+	var user User
+	err := db.QueryRow("SELECT id, username, email, password FROM users WHERE username = ?", username).Scan(&user.ID, &user.Username, &user.Email, &user.Password)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func getUserByUsernameAndPassword(username, password string) (*User, error) {
+	var user User
+	err := db.QueryRow("SELECT id, username, email, password FROM users WHERE username = ? AND password = ?", username, password).Scan(&user.ID, &user.Username, &user.Email, &user.Password)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func renderTemplate(w http.ResponseWriter, tmplFiles []string, data interface{}) {
+	tmpl, err := template.ParseFiles(tmplFiles...)
+	if err != nil {
+		http.Error(w, "Server Error", http.StatusInternalServerError)
+		return
+	}
+	err = tmpl.Execute(w, data)
+	if err != nil {
+		http.Error(w, "Server Error", http.StatusInternalServerError)
+		return
+	}
 }
