@@ -51,7 +51,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	/*http.HandleFunc("/account", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/account", func(w http.ResponseWriter, r *http.Request) {
 		// Получение значения куки с именем пользователя
 		cookie, err := r.Cookie("username")
 		if err != nil || cookie.Value == "" {
@@ -67,7 +67,7 @@ func main() {
 		http.ServeFile(w, r, "account.html")
 	})
 
-	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+	/*http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
 			// Чтение данных из формы
 			err := r.ParseForm()
@@ -170,8 +170,8 @@ func main() {
 		}
 
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-	})
+	})*/
 
 	// Запуск сервера на порту 8080
-	log.Fatal(http.ListenAndServe(":8080", nil))*/
+	//log.Fatal(http.ListenAndServe(":8080", nil))
 }
