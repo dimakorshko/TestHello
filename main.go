@@ -24,7 +24,7 @@ func main() {
 	var err error
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080" // Порт по умолчанию, если переменная окружения не установлена
+		port = "443" // Порт по умолчанию, если переменная окружения не установлена
 	}
 
 	err = http.ListenAndServe(":"+port, nil)
