@@ -27,11 +27,6 @@ func main() {
 		port = "443" // Порт по умолчанию, если переменная окружения не установлена
 	}
 
-	err = http.ListenAndServe(":"+port, nil)
-	if err != nil {
-		panic(err)
-	}
-
 	// Открываем соединение с базой данных SQLite3
 
 	db, err = sql.Open("sqlite3", "users.db")
@@ -59,7 +54,12 @@ func main() {
 
 	// Запуск сервера на порту 8080
 	log.Println("Server started on http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	//log.Fatal(http.ListenAndServe(":8080", nil))
+
+	err = http.ListenAndServe(":"+port, nil)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
