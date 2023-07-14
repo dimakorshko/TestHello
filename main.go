@@ -46,6 +46,9 @@ func main() {
 		log.Fatal(err)
 	}
 
+	fs := http.FileServer(http.Dir("static")) // Замените "static" на путь к каталогу со статическими файлами
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
+
 	// Регистрация и обработка маршрутов
 	http.HandleFunc("/", homeHandler)
 	http.HandleFunc("/register", registerHandler)
@@ -64,7 +67,7 @@ func main() {
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	// Отображение домашней страницы
-	renderTemplate(w, []string{"front/index.html"}, nil)
+	renderTemplate(w, []string{"index.html"}, nil)
 
 }
 
