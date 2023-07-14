@@ -1,0 +1,377 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap');
+
+
+*{
+    box-sizing: border-box;
+}
+
+
+body{
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: #01B7F1;
+    transition: 0.5s;
+}
+
+body.active{
+    background-color: #F1CB01;
+}
+
+/* Контейнер */
+
+.container{
+    width: 800px;
+    height: 500px;
+    padding: 40px 0;
+    position: relative;
+}
+
+/* Внутрішній блок */
+
+.block{
+    height: 100%;   
+    background-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 5px 45px rgba(0, 0, 0, 0.2);
+
+    display: flex;
+    align-items: center;
+}
+
+.block__item{
+    width:50%;
+}
+
+/* Елементи блоку */
+
+.block-item{
+    text-align: center;
+
+}
+
+.block-item__title{
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+.block-item__btn{
+    border: none;
+    cursor: pointer;
+    padding: 10px 20px;
+    background-color: #fff;
+    color: #333;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* Блок форми */
+
+.form-box{
+    background-color: #fff;
+    height: 100%;
+    width: 50%;
+    box-shadow: 0 5px 45px rgba(0, 0, 0, 0.25);
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+
+    transition: 0.5s ease-in-out;
+
+    display: flex;
+    align-items: center;
+
+    overflow: hidden;
+}
+
+.form-box.active{
+    left: 50%;
+}
+
+.form{
+    width: 100%;
+    padding: 50px;
+    font-size: 16px; 
+    position: absolute; 
+    transition: 0.5s;
+}
+
+.form_signin{
+    left: 0;
+    transition-delay: 0.25s;
+}
+
+.form_signup{
+    left: 100%;
+    transition-delay: 0s;
+}
+
+.form-box.active .form_signin{
+    left: -100%;
+    transition-delay: 0s;
+}
+
+.form-box.active .form_signup{
+    left: 0;
+    transition-delay: 0.25s;
+}
+
+
+.form__title{
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.form__input{
+    width: 100%;
+    padding: 10px;
+    border: solid 1px #333;
+    font-size: inherit;
+}
+
+.form__btn{
+    border: none;
+    cursor: pointer;
+    font-size: inherit;
+    background-color: #01B7F1;
+    color: #fff;
+    padding: 10px 50px;
+}
+
+form__btn_signup{
+    background-color: #F1CB01;
+}
+
+.form__forgot{
+    color: #333;
+}
+
+/* СТОРІНКА ДОДАВАННЯ ФАЙЛУ */
+
+.body2{
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: #fff;
+    transition: 0.5s;
+}
+
+.new_div{
+    width: 50%;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    
+    background-color: #fff;
+}
+.new_div2{
+    width: 50%;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    right: 0;
+    
+    background-color: #fff;
+}
+
+.btn_mane{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 10px 20px;
+
+    background-color: #7E7E7E;
+    height: 90px;
+    width: 500px;
+    box-shadow: 0 5px 45px rgba(0, 0, 0, 0.25);
+
+    border: none;
+    border-radius: 5px;
+    font-size: 24px;
+    color: #fff;
+    font-weight: bold;
+    
+}
+
+#upload-text{
+    font-size: 20px;
+    color: gray;
+    text-align: center;
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, 80%);
+    padding: 10px 20px;
+}
+
+#upload-btn label{
+    padding: 10px;
+}
+
+
+.new_div:hover,
+.new_div:hover .btn_mane {
+    background-color: #01B7F1;
+}
+
+.new_div2:hover,
+.new_div2:hover .btn_mane {
+    background-color: #F1CB01;
+}
+
+
+
+/* /*ФІНАЛЬНА СТОРІНКА */
+
+.diva {
+    width: 50%;
+    height: 50%;
+    position: absolute;
+    box-sizing: border-box;
+    background-color: white;
+    transition: background-color 0.3s;
+  }
+  
+  .diva:nth-child(1) {
+    top: 0;
+    left: 0;
+  }
+  
+  .diva:nth-child(2) {
+    top: 0;
+    right: 0;
+  }
+  
+  .diva:nth-child(3) {
+    bottom: 0;
+    left: 0;
+  }
+  
+  .diva:nth-child(4) {
+    bottom: 0;
+    right: 0;
+  }
+  
+  .diva:hover {
+    background-color: gray;
+  }
+
+  .diva:hover button {
+    background-color: white;
+    color: black;
+  }
+  
+
+  .btn_fin{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 10px 20px;
+
+    background-color: #7E7E7E;
+    height: 60px;
+    width: 240px;
+    box-shadow: 0 5px 45px rgba(0, 0, 0, 0.25);
+
+    border: none;
+    border-radius: 5px;
+    font-size: 24px;
+    color: #fff;
+    font-weight: bold;
+    
+}
+
+.diva h1 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+  }
+
+.pass{
+    position: absolute;
+    width: 20%;
+    padding: 10px;
+    border: solid 1px #333;
+    font-size: inherit;
+    position: absolute;
+    top: 70%;
+    left: 40%;
+}
+
+/* PROFILE */
+
+.profile-icon {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+  }
+
+.profile-title {
+    top: 0;
+    left:0;
+    text-align: center;
+    font-size: 24px;
+    margin-top: 100px;
+}
+
+.profile-label {
+    margin-left: 50px;
+    font-size: 18px;
+}
+    
+/*Адаптив
+
+@media (max-width: 992px){
+    .container{
+        max-width: 400px;
+        height: 650px;
+        padding: 0;
+        margin: 0 20px;
+    }
+
+    .block{
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .block-item{
+        width: 100%;
+        padding: 30px 0;
+    }
+
+    .form-box{
+        width: 100%;
+        height: 500px;
+        box-shadow: none;
+
+        top: 0;
+    }
+
+    .form-box.active{
+        top: 150px;
+        left: 0;
+    }
+}

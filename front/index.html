@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Contract</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <!-- Контейнер -->
+    <article class="container">
+
+        <!-- Внутрішній блок -->
+        <div class="block">
+            <section class="block__item block-item ">
+                <h2 class="block-item__title">У вас вже є аккаунт?</h2>
+                <button class="block-item__btn signin-btn">Увійти</button>
+            </section>
+            <section class="block__item block-item ">
+                <h2 class="block-item__title">У вас немає аккаунта?</h2>
+                <button class="block-item__btn signup-btn">Зареєструватися</button>
+            </section>
+        </div>
+        
+        <!-- Блок форми -->
+        <div class="form-box">
+
+
+            <!-- Форма входу -->
+            <form action="#" class="form form_signin">
+                <h3 class="form__title">Вхід</h3>
+
+                <p>
+                    <input type="text" id="username" class="form__input" placeholder="Логін">
+                </p>
+                <p>
+                    <input type="password" id="password" class="form__input" placeholder="Пароль">
+                </p>
+                <p>
+                    <button type="button" onclick="redirectToHomePage()" class="form__btn">Увійти</button>
+                </p>
+                <p>
+                    <a href="#" class="form__forgot">Забули пароль?</a>
+                </p>
+            </form>
+
+            <!-- Форма реєстрації -->
+            <form action="#" class="form form_signup">
+                <h3 class="form__title">Зареєструватися</h3>
+
+                <p>
+                    <input type="text" class="form__input" placeholder="Логін">
+                </p>
+                <p>
+                    <input type="email" class="form__input" placeholder="Email">
+                </p>
+                <p>
+                    <input type="password" class="form__input" placeholder="Пароль">
+                </p>
+                <p>
+                    <input type="password" class="form__input" placeholder="Підтвердіть пароль">
+                </p>
+                <p>
+                    <button class="form__btn form__btn_signup">Зареєструватися</button>
+                </p>
+            </form>
+
+        </div>
+
+    </article>
+</body>
+</html>

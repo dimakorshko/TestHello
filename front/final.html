@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Contract2</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+        <div class="diva" id="diva">
+            <h1>Приватний ключ</h1>
+            <button class="btn_fin" onclick="showPasswordField()">Завантажити</button>
+            <input type="password" id="passwordField"  placeholder="Введіть пароль" class="pass">
+        </div>
+        <div class="diva">
+            <h1>Підписаний контракт</h1>
+            <button class="btn_fin">Завантажити</button>
+        </div>
+        <div class="diva">
+            <h1>Публічний ключ</h1>
+            <button class="btn_fin">Завантажити</button>
+        </div>
+        <div class="diva">
+            <h1>Результати виконання програми</h1>
+        </div>
+    <script>
+        function showPasswordField() {
+        var passwordField = document.getElementById("passwordField").value;
+
+        if (passwordField !== "") {
+            var diva = document.querySelector(".diva");
+            diva.innerHTML = "<h1>Ви ввели пароль</h1>";
+        }
+        else{
+            alert("Введіть пароль!");
+        }
+    }
+    </script>
+</body>
+</html>

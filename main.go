@@ -53,7 +53,7 @@ func main() {
 	http.HandleFunc("/profile", profileHandler)
 
 	// Запуск сервера на порту 8080
-	log.Println("Server started on http://localhost:8080")
+	log.Println("Server started on http://localhost:443")
 	//log.Fatal(http.ListenAndServe(":8080", nil))
 
 	err = http.ListenAndServe(":"+port, nil)
@@ -64,7 +64,7 @@ func main() {
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	// Отображение домашней страницы
-	renderTemplate(w, []string{"templates/home.html"}, nil)
+	renderTemplate(w, []string{"front/index.html"}, nil)
 
 }
 

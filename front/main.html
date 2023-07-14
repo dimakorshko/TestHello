@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Contract2</title>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body class="body2">
+    <div class="new_div">
+        <button id="run-btn" class="btn_mane" >Підписати контракт</button>
+    </div>
+    <div class="new_div2">
+        <input type="file" id="upload-file" hidden="hidden">
+        <button id="upload-btn" class="btn_mane"><label for="upload-file">Додати файл контракту</label></button>
+        <span id="upload-text">Файл не додано</span>
+    </div>
+    <img class="profile-icon" src="icon_profile.png" alt="Профіль" onclick="openProfilePage()">
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+          const uploadFile = document.getElementById("upload-file");
+          const uploadText = document.getElementById("upload-text");
+          const btnRunProgram = document.getElementById("run-btn");
+      
+          uploadFile.addEventListener("change", function() {
+            if (uploadFile.value) {
+              const fileName = uploadFile.value.match(/([^\\\/]+)$/)[1];
+              uploadText.innerText = fileName;
+              btnRunProgram.disabled = false; 
+            } else {
+              uploadText.innerText = "Файл не додано";
+              btnRunProgram.disabled = true;
+            }
+          });
+      
+          btnRunProgram.addEventListener("click", function() {
+            if (uploadText.innerText === "Файл не додано") {
+              alert("Будь ласка, виберіть файл перед запуском програми.");
+              return; 
+            }
+            window.location.href = "final.html";
+          });
+        });
+        function openProfilePage() {
+          window.location.href = "profile.html";
+        }
+      </script>
+</body>
+</html>
