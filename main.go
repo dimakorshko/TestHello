@@ -129,7 +129,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Отображение страницы авторизации
-	renderTemplate(w, []string{"templates/login.html"}, nil)
+	renderTemplate(w, []string{"index.html"}, nil)
 
 }
 
@@ -148,7 +148,7 @@ func profileHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Отображение профиля пользователя
-	renderTemplate(w, []string{"templates/profile.html"}, user)
+	renderTemplate(w, []string{"main.html"}, user)
 
 }
 

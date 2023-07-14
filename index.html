@@ -30,17 +30,17 @@
 
 
             <!-- Форма входу -->
-            <form action="#" class="form form_signin">
+            <form class="form form_signin" method="POST" action="/login">
                 <h3 class="form__title">Вхід</h3>
 
                 <p>
-                    <input type="text" id="username" class="form__input" placeholder="Логін">
+                    <input type="text" id="username" class="form__input" placeholder="Логін" name="username" required>
                 </p>
                 <p>
-                    <input type="password" id="password" class="form__input" placeholder="Пароль">
+                    <input type="password" id="password" class="form__input" placeholder="Пароль" name="password" required>
                 </p>
                 <p>
-                    <button type="button" onclick="redirectToHomePage()" class="form__btn">Увійти</button>
+                    <button type="submit" class="form__btn">Увійти</button>
                 </p>
                 <p>
                     <a href="#" class="form__forgot">Забули пароль?</a>
@@ -48,23 +48,23 @@
             </form>
 
             <!-- Форма реєстрації -->
-            <form action="#" class="form form_signup">
+            <form class="form form_signup" method="POST" action="/register">
                 <h3 class="form__title">Зареєструватися</h3>
 
                 <p>
-                    <input type="text" class="form__input" placeholder="Логін">
+                    <input type="text" class="form__input" placeholder="Логін" name="username" required>
                 </p>
                 <p>
-                    <input type="email" class="form__input" placeholder="Email">
+                    <input type="email" class="form__input" placeholder="Email" name="email" required>
                 </p>
                 <p>
-                    <input type="password" class="form__input" placeholder="Пароль">
+                    <input type="password" class="form__input" placeholder="Пароль" name="password" required>
                 </p>
                 <p>
-                    <input type="password" class="form__input" placeholder="Підтвердіть пароль">
+                    <input type="password" class="form__input" placeholder="Підтвердіть пароль" name="password" required>
                 </p>
                 <p>
-                    <button class="form__btn form__btn_signup">Зареєструватися</button>
+                    <button type="submit" class="form__btn form__btn_signup">Зареєструватися</button>
                 </p>
             </form>
 
