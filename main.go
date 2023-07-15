@@ -77,6 +77,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		username := r.FormValue("username")
 		email := r.FormValue("email")
 		password := r.FormValue("password")
+		confirmPassword := r.FormValue("confirmPassword")
 
 		// Проверка, что пользователь с таким именем пользователя не существует
 		existingUser, err := getUserByUsername(username)
@@ -86,6 +87,12 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		if existingUser != nil {
 			http.Error(w, "Username already exists", http.StatusBadRequest)
+			return
+		}
+		
+		// Проверка соответствия паролей
+		if password != confirmPassword {
+			http.Error(w, "Passwords do not match", http.StatusBadRequest)
 			return
 		}
 
