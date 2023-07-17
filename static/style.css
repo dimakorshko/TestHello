@@ -1,5 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap');
-
+@font-face {
+    font-family: 'Open Sans';
+    src: url('Poppins-Regular.ttf') format('truetype');
+  }
 
 *{
     box-sizing: border-box;
@@ -350,7 +352,7 @@ form__btn_signup{
 
 
     
-/*Адаптив
+/* Адаптив */
 
 @media (max-width: 992px){
     .container{
@@ -383,4 +385,81 @@ form__btn_signup{
         top: 150px;
         left: 0;
     }
+
+
+    .new_div,
+    .new_div2 {
+      width: 100%;
+      height: auto;
+      position: static;
+      margin-bottom: 20px;
+    }
+  
+    .btn_mane {
+      position: static;
+      transform: none;
+      width: 100%;
+      max-width: 500px;
+    }
+  
+    #upload-text {
+      font-size: 16px;
+    }
+
+    .body2 {
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #fff;
+        transition: 0.5s;
+      }
+    
+      .new_div,
+      .new_div2 {
+        width: 100%;
+        height: 50vh;
+        position: relative;
+        background-color: white;
+      }
+    
+      .btn_mane {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 10px 20px;
+        background-color: #7E7E7E;
+        height: 90px;
+        width: 500px;
+        box-shadow: 0 5px 45px rgba(0, 0, 0, 0.25);
+        border: none;
+        border-radius: 5px;
+        font-size: 24px;
+        color: #fff;
+        font-weight: bold;
+      }
+    
+      #upload-text {
+        font-size: 20px;
+        color: gray;
+        text-align: center;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, 80%);
+        padding: 10px 20px;
+      }
+    
+      .new_div:hover,
+      .new_div:hover .btn_mane {
+        background-color: #01B7F1;
+      }
+    
+      .new_div2:hover,
+      .new_div2:hover .btn_mane {
+        background-color: #F1CB01;
+      }
 }
