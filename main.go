@@ -19,6 +19,7 @@ type User struct {
 }
 
 var db *sql.DB
+var user *User
 
 func main() {
 	var err error
@@ -53,6 +54,7 @@ func main() {
 	http.HandleFunc("/", homeHandler)
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/login", loginHandler)
+	http.HandleFunc("/main", mainHandler)
 	http.HandleFunc("/profile", profileHandler)
 
 	// Запуск сервера на порту 8080
@@ -89,7 +91,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Username already exists", http.StatusBadRequest)
 			return
 		}
-		
+
 		// Проверка соответствия паролей
 		if password != confirmPassword {
 			http.Error(w, "Passwords do not match", http.StatusBadRequest)
@@ -131,7 +133,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Создание сессии пользователя (можно использовать куки)
 		// В данном примере просто сохраняем имя пользователя в URL запроса
-		http.Redirect(w, r, "/profile?username="+user.Username, http.StatusFound)
+		http.Redirect(w, r, "/main?username="+user.Username, http.StatusFound)
 		return
 	}
 
@@ -140,11 +142,12 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func profileHandler(w http.ResponseWriter, r *http.Request) {
+func mainHandler(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 
 	// Получение пользователя по имени пользователя из базы данных
-	user, err := getUserByUsername(username)
+	var err error
+	user, err = getUserByUsername(username)
 	if err != nil {
 		http.Error(w, "Server Error", http.StatusInternalServerError)
 		return
@@ -154,8 +157,15 @@ func profileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Отображение профиля пользователя
+	// Отображение страницы для работы с контрактом
 	renderTemplate(w, []string{"main.html"}, user)
+
+}
+
+func profileHandler(w http.ResponseWriter, r *http.Request) {
+
+	// Отображение страницы для работы с контрактом
+	renderTemplate(w, []string{"profile.html"}, user)
 
 }
 

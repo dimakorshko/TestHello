@@ -16,8 +16,8 @@
         <input type="file" id="upload-file" hidden="hidden">
         <button id="upload-btn" class="btn_mane"><label for="upload-file">Додати файл контракту</label></button>
         <span id="upload-text">Файл не додано</span>
-    </div>
-    <img class="profile-icon" src="static/icon_profile.png" alt="Профіль" onclick="openProfilePage()">
+    </div>	
+    <a href="/profile" id="profile-link"><img class="profile-icon" src="static/icon_profile.png" alt="Профіль" onclick="openProfilePage()"></a>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
           const uploadFile = document.getElementById("upload-file");
