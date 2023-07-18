@@ -1,5 +1,6 @@
 # Указываем базовый образ
 FROM golang:latest
+FROM python:latest
 
 # Устанавливаем рабочую директорию внутри контейнера
 WORKDIR /app
@@ -7,6 +8,8 @@ WORKDIR /app
 # Копируем файлы проекта в рабочую директорию
 COPY . .
 
+# Устанавливаем зависимости Python из requirements.txt
+RUN pip install -r requirements.txt
 # Собираем программу
 RUN go build -o main
 
