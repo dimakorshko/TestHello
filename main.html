@@ -10,10 +10,16 @@
 </head>
 <body class="body2">
     <div class="new_div">
-        <button id="run-btn" class="btn_mane" >Підписати контракт</button>
-    </div>
+		<form action="/final" method="post">
+			<button type = "submit" id="run-btn" class="btn_mane">Підписати контракт</button>
+		</form>
+	<!--<a href="/profile" id="profile-link"><button id="run-btn" class="btn_mane" >Підписати контракт</button></a>  <button id="run-btn" class="btn_mane" type="submit">Підписати контракт</button>-->
+        <form action="/signContract" method="post" enctype="multipart/form-data">
+			<input type="file" id="upload-file" hidden="hidden" onchange="handleFileUpload(event)" enctype="multipart/form-data">
+			
+		</form>
+	</div>
     <div class="new_div2">
-        <input type="file" id="upload-file" hidden="hidden">
         <button id="upload-btn" class="btn_mane"><label for="upload-file">Додати файл контракту</label></button>
         <span id="upload-text">Файл не додано</span>
     </div>	
@@ -46,6 +52,40 @@
         function openProfilePage() {
           window.location.href = "profile.html";
         }
+		function sendFileToServer(file) {
+	var formData = new FormData();
+  formData.append("upload-file", file);
+
+  fetch("/signContract", {
+    method: "POST",
+    body: formData
+  })
+    .then(response => {
+      if (response.ok) {
+        console.log("Файл успешно отправлен на сервер");
+      } else {
+        console.error("Ошибка при отправке файла на сервер");
+      }
+    })
+    .catch(error => {
+      console.error("Ошибка при отправке файла:", error);
+    });
+}
+var formSubmitted = false; // Флаг, указывающий, была ли уже отправлена форма
+
+function handleFileUpload(event) {
+  if (formSubmitted) {
+    return; // Если форма уже отправлена, прекратить выполнение обработчика
+  }
+
+  var fileInput = event.target;
+  var file = fileInput.files[0];
+  sendFileToServer(file);
+
+  formSubmitted = true; // Установить флаг, указывающий, что форма отправлена
+}
+
+
       </script>
 </body>
 </html>
