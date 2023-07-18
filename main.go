@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
+	_ "encoding/json"
 	"encoding/pem"
 	"errors"
 	"fmt"
@@ -23,6 +24,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	_ "net/url"
 	"os"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -33,6 +35,15 @@ type User struct {
 	Username string
 	Email    string
 	Password string
+}
+
+type ReplitRequest struct {
+	Code     string `json:"code"`
+	Language string `json:"language"`
+}
+
+type ReplitResponse struct {
+	Result string `json:"result"`
 }
 
 var (
@@ -160,15 +171,16 @@ func contractHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Виконання пайтоновської програми з підписаного контракту
 	result, err := executePythonProgram(contractData)
-	handleError("Помилка при виконанні пайтоновської програми:", err)
+	if err != nil {
+		fmt.Println("Помилка при виконанні пайтоновської програми:", err)
+		return
+	}
 
-	// Вивід на екран результату виконання пайтоновської програми
 	fmt.Println("Результат виконання пайтоновської програми:")
 	fmt.Println(result)
 
 	fmt.Println("Операції завершено успішно.")
-
-	fmt.Println(handler)
+	handler = handler
 }
 
 /*Регистрация*/
