@@ -1,2 +1,2 @@
 web: TestHello
-worker: python contract.py
+web: python contract.py
