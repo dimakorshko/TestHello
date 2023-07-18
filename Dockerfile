@@ -2,6 +2,8 @@
 FROM golang:latest
 FROM python:latest
 
+RUN apt-get update && apt-get install -y golang
+
 # Устанавливаем рабочую директорию внутри контейнера
 WORKDIR /app
 
