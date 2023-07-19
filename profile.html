@@ -153,12 +153,14 @@
             <a href="/downloadPublicKey" class="btn btn-primary"><button class="btn_fin">Завантажити</button></a>
         </div>
         <div class="div_pass" id="div_pass">
-            <h1>Приватний ключ</h1>
-            <form action="downloadPrivateKey">
-              <a class="btn btn-primary"><button type="submit" class="btn_fin" onclick="showPasswordField()">Завантажити</button></a>    
-              <input type="password" id="passwordField"  placeholder="Введіть пароль" class="pass">
-            </form>
-        </div>
+          <h1>Приватний ключ</h1>
+          <form method="POST" action="/downloadPrivateKey"> <!-- Исправленный атрибут action -->
+              <a class="btn btn-primary">
+                  <button type="submit" class="btn_fin" onclick="showPasswordField()">Завантажити</button>
+              </a>    
+              <input type="password" id="password" class="form__input" placeholder="Пароль" name="password" required> <!-- Исправленный идентификатор -->
+          </form>
+      </div>
     </div>
     <script>
         function showPasswordField() {
