@@ -5,27 +5,23 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
-	_ "encoding/json"
+	"database/sql"
 	"encoding/pem"
 	"errors"
 	"fmt"
-	_ "io"
+	_ "fmt"
+	"html/template"
 	"io/ioutil"
+	"log"
 	"math/big"
-	_ "mime/multipart"
+	"net/http"
+	_ "net/url"
+	"os"
 	"os/exec"
 	"strings"
 	"time"
 
 	"github.com/fullsailor/pkcs7"
-
-	"database/sql"
-	_ "fmt"
-	"html/template"
-	"log"
-	"net/http"
-	_ "net/url"
-	"os"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -37,25 +33,15 @@ type User struct {
 	Password string
 }
 
-type ReplitRequest struct {
-	Code     string `json:"code"`
-	Language string `json:"language"`
-}
-
-type ReplitResponse struct {
-	Result string `json:"result"`
-}
-
 var (
-	privateKey  *rsa.PrivateKey
-	publicKey   *rsa.PublicKey
-	certificate *x509.Certificate
+	privateKey    *rsa.PrivateKey
+	publicKey     *rsa.PublicKey
+	certificate   *x509.Certificate
+	contractErors bool = true
+	db            *sql.DB
+	user          *User
+	result        string = ""
 )
-
-var contractErors bool = true
-var db *sql.DB
-var user *User
-var result string = ""
 
 func main() {
 	var err error
@@ -96,10 +82,9 @@ func main() {
 	http.HandleFunc("/profile", profileHandler)
 	http.HandleFunc("/signContract", contractHandler)
 	http.HandleFunc("/final", finalHandler)
-	//http.HandleFunc("/downloadPrivateKey", downloadPrivateKeyHandler)
+	http.HandleFunc("/downloadPrivateKey", downloadPrivateKeyHandler)
 	http.HandleFunc("/downloadPublicKey", downloadPublicKeyHandler)
 	http.HandleFunc("/downloadSignedContract", downloadSignedContractHandler)
-
 	log.Println("Server started on http://localhost:443")
 
 	err = http.ListenAndServe(":"+port, nil)
@@ -111,163 +96,6 @@ func main() {
 // Отображение домашней страницы с регистрацией и авторизацией
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, []string{"index.html"}, nil)
-}
-
-// getKeysFromDB retrieves the private and public keys from the database for the given username.
-func getKeysFromDB(username string) (privateKey, publicKey string, err error) {
-	err = db.QueryRow("SELECT private_key, public_key FROM users WHERE username = ?", username).Scan(&privateKey, &publicKey)
-	if err != nil {
-		return "", "", err
-	}
-	return privateKey, publicKey, nil
-}
-
-/*
-	func downloadPrivateKeyHandler(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "POST" {
-			// Получаем приватный ключ из базы данных для текущего пользователя
-			password := r.FormValue("password")
-
-			// Получаем пароль из базы данных для текущего пользователя
-			correctPassword, err := getPasswordFromDB(user.Username)
-			fmt.Println(correctPassword)
-			fmt.Println("A")
-			fmt.Println(password)
-			if err != nil {
-				http.Error(w, "Server Error", http.StatusInternalServerError)
-				return
-			}
-
-			// Сверяем введенный пароль с паролем из базы данных
-			if password != correctPassword {
-				http.Error(w, "Неправильний пароль", http.StatusUnauthorized)
-				return
-			}
-
-			privateKey, err := getPrivateKeyFromDB(user.Username)
-			if err != nil {
-				//http.Error(w, "Server Error", http.StatusInternalServerError)
-				http.ServeContent(w, r, "", time.Now(), bytes.NewReader([]byte("Private key not found")))
-				return
-			}
-
-			// Отправляем приватный ключ в виде файла для скачивания
-			w.Header().Set("Content-Disposition", "attachment; filename=private_key.pem")
-			w.Header().Set("Content-Type", "application/octet-stream")
-			http.ServeContent(w, r, "", time.Now(), bytes.NewReader([]byte(privateKey)))
-		}
-	}
-*/
-func downloadPublicKeyHandler(w http.ResponseWriter, r *http.Request) {
-	// Получаем публичный ключ из базы данных для текущего пользователя
-	publicKey, err := getPublicKeyFromDB(user.Username)
-	if err != nil {
-		http.ServeContent(w, r, "", time.Now(), bytes.NewReader([]byte("Public key not found")))
-		//http.Error(w, "Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	// Отправляем публичный ключ в виде файла для скачивания
-	w.Header().Set("Content-Disposition", "attachment; filename=public_key.pem")
-	w.Header().Set("Content-Type", "application/octet-stream")
-	http.ServeContent(w, r, "", time.Now(), bytes.NewReader([]byte(publicKey)))
-}
-
-func downloadSignedContractHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Disposition", "attachment; filename=signed_contract.p7s")
-	w.Header().Set("Content-Type", "application/octet-stream")
-	signedContract, err := ioutil.ReadFile("signed_contract.p7s")
-	if err != nil {
-		http.Error(w, "Server Error", http.StatusInternalServerError)
-		return
-	}
-	http.ServeContent(w, r, "", time.Now(), bytes.NewReader(signedContract))
-}
-
-// ОТкрытие финальной страницы
-func finalHandler(w http.ResponseWriter, r *http.Request) {
-	if contractErors != true {
-		renderTemplate(w, []string{"final.html"}, result)
-	} else {
-		renderTemplate(w, []string{"main.html"}, user)
-	}
-}
-
-/**/
-/*Подпись контракта*/
-/**/
-func contractHandler(w http.ResponseWriter, r *http.Request) {
-	contractErors = true
-	generateKeysAndCertificate()
-	//printKeysAndCertificate()
-
-	if r.Method != http.MethodPost {
-		http.Error(w, "Метод не разрешен", http.StatusMethodNotAllowed)
-		return
-	}
-
-	// Парсинг формы
-	err := r.ParseMultipartForm(32 << 20) // Указывает максимальный размер файла
-	if err != nil {
-		http.Error(w, "Ошибка при обработке формы", http.StatusInternalServerError)
-		return
-	}
-
-	// Получение файла из формы
-	file, handler, err := r.FormFile("upload-file")
-	if err != nil {
-		http.Error(w, "Не удалось получить файл", http.StatusBadRequest)
-		fmt.Println(http.StatusBadRequest)
-		return
-	}
-	defer file.Close()
-	fmt.Println(file)
-	// Чтение данных файла
-	contractData, err := ioutil.ReadAll(file)
-	if err != nil {
-		http.Error(w, "Не удалось прочитать данные файла", http.StatusInternalServerError)
-		fmt.Println(http.StatusInternalServerError)
-		return
-	}
-
-	// Пример: Вывод данных файла на серверной стороне
-	fmt.Println("Данные файла:", string(contractData))
-
-	// Отправка ответа клиентской части
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Файл успешно принят и обработан"))
-
-	// Перевірка контракту перед підписанням
-	err = validateContract(contractData)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	// Підписання контракту
-	signedContract, err := signContract(contractData)
-	handleError("Не вдалося підписати смарт контракт:", err)
-
-	// Вивід на екран результату підписання контракту
-	fmt.Println("Смарт контракт підписано успішно.")
-
-	// Збереження підписаного контракту у файл
-	err = saveSignedContract(signedContract)
-	handleError("Не вдалося зберегти підписаний контракт:", err)
-
-	// Виконання пайтоновської програми з підписаного контракту
-	result, err := executePythonProgram(contractData)
-	if err != nil {
-		fmt.Println("Помилка при виконанні пайтоновської програми:", err)
-		return
-	}
-
-	fmt.Println("Результат виконання пайтоновської програми:")
-	fmt.Println(result)
-
-	fmt.Println("Операції завершено успішно.")
-	handler = handler
-	contractErors = false
 }
 
 /*Регистрация*/
@@ -362,11 +190,157 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+/*Отображение профиля*/
 func profileHandler(w http.ResponseWriter, r *http.Request) {
 
-	// Отображение страницы для работы с контрактом
+	// Отображение страницы Ппрофиля
 	renderTemplate(w, []string{"profile.html"}, user)
 
+}
+
+/**/
+/*Подпись контракта*/
+/**/
+func contractHandler(w http.ResponseWriter, r *http.Request) {
+	contractErors = true
+	generateKeysAndCertificate()
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "Метод не разрешен", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Парсинг формы
+	err := r.ParseMultipartForm(32 << 20) // Указывает максимальный размер файла
+	if err != nil {
+		http.Error(w, "Ошибка при обработке формы", http.StatusInternalServerError)
+		return
+	}
+
+	// Получение файла из формы
+	file, handler, err := r.FormFile("upload-file")
+	if err != nil {
+		http.Error(w, "Не удалось получить файл", http.StatusBadRequest)
+		fmt.Println(http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+
+	// Чтение данных файла
+	contractData, err := ioutil.ReadAll(file)
+	if err != nil {
+		http.Error(w, "Не удалось прочитать данные файла", http.StatusInternalServerError)
+		fmt.Println(http.StatusInternalServerError)
+		return
+	}
+	//fmt.Println("Данные файла:", string(contractData))
+
+	// Отправка ответа клиентской части
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Файл успешно принят и обработан"))
+
+	// Перевірка контракту перед підписанням
+	err = validateContract(contractData)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Підписання контракту
+	signedContract, err := signContract(contractData)
+	handleError("Не вдалося підписати смарт контракт:", err)
+
+	// Вивід на екран результату підписання контракту
+	fmt.Println("Смарт контракт підписано успішно.")
+
+	// Збереження підписаного контракту у файл
+	err = saveSignedContract(signedContract)
+	handleError("Не вдалося зберегти підписаний контракт:", err)
+
+	// Виконання пайтоновської програми з підписаного контракту
+	result, err := executePythonProgram(contractData)
+	if err != nil {
+		fmt.Println("Помилка при виконанні пайтоновської програми:", err)
+		return
+	}
+
+	fmt.Println("Результат виконання пайтоновської програми:")
+	fmt.Println(result)
+
+	fmt.Println("Операції завершено успішно.")
+	handler = handler
+	contractErors = false
+}
+
+// Открытие страницы с результатами
+func finalHandler(w http.ResponseWriter, r *http.Request) {
+	if contractErors != true {
+		renderTemplate(w, []string{"final.html"}, result)
+	} else {
+		// Выводим JavaScript для вызова alert на стороне клиента
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		fmt.Fprint(w, `<script>alert("Не вдалося виконати операцію, перевірте чи точно ви відправляєте файл .py, що містить код python");</script>`)
+		renderTemplate(w, []string{"main.html"}, user)
+	}
+}
+
+// Отправка для скачивания приватного ключа, также проверка введенного пароля на клиенте
+func downloadPrivateKeyHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		// Получаем приватный ключ из базы данных для текущего пользователя
+		password := r.FormValue("password")
+
+		// Получаем пароль из базы данных для текущего пользователя
+		correctPassword, err := getPasswordFromDB(user.Username)
+		if err != nil {
+			http.Error(w, "Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		// Сверяем введенный пароль с паролем из базы данных
+		if password != correctPassword {
+			http.Error(w, "Неправильний пароль", http.StatusUnauthorized)
+			return
+		}
+
+		privateKey, err := getPrivateKeyFromDB(user.Username)
+		if err != nil {
+			//http.Error(w, "Server Error", http.StatusInternalServerError)
+			http.ServeContent(w, r, "", time.Now(), bytes.NewReader([]byte("Private key not found")))
+			return
+		}
+
+		// Отправляем приватный ключ в виде файла для скачивания
+		w.Header().Set("Content-Disposition", "attachment; filename=private_key.pem")
+		w.Header().Set("Content-Type", "application/octet-stream")
+		http.ServeContent(w, r, "", time.Now(), bytes.NewReader([]byte(privateKey)))
+	}
+}
+
+// Загрузка приватного ключа
+func downloadPublicKeyHandler(w http.ResponseWriter, r *http.Request) {
+	// Получаем публичный ключ из базы данных для текущего пользователя
+	publicKey, err := getPublicKeyFromDB(user.Username)
+	if err != nil {
+		http.ServeContent(w, r, "", time.Now(), bytes.NewReader([]byte("Public key not found")))
+		return
+	}
+
+	// Отправляем публичный ключ в виде файла для скачивания
+	w.Header().Set("Content-Disposition", "attachment; filename=public_key.pem")
+	w.Header().Set("Content-Type", "application/octet-stream")
+	http.ServeContent(w, r, "", time.Now(), bytes.NewReader([]byte(publicKey)))
+}
+
+func downloadSignedContractHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Disposition", "attachment; filename=signed_contract.p7s")
+	w.Header().Set("Content-Type", "application/octet-stream")
+	signedContract, err := ioutil.ReadFile("signed_contract.p7s")
+	if err != nil {
+		http.Error(w, "Server Error", http.StatusInternalServerError)
+		return
+	}
+	http.ServeContent(w, r, "", time.Now(), bytes.NewReader(signedContract))
 }
 
 // Считывание с БД данных по имени
@@ -424,31 +398,22 @@ func generateKeysAndCertificate() {
 		}
 	}
 
-	// Parse private key from PEM format
+	// Пасринг закрытого ключа из формата PEM
 	privateKey, err = parsePrivateKeyFromPEM(privateKeyPEM)
 	if err != nil {
 		fmt.Println("Failed to parse private key:", err)
 		return
 	}
 
-	// Parse public key from PEM format
+	// Пасринг публичного ключа из формата PEM
 	publicKey, err = parsePublicKeyFromPEM(publicKeyPEM)
 	if err != nil {
 		fmt.Println("Failed to parse public key:", err)
 		return
 	}
 
-	// Generate self-signed certificate
+	// Генерируется сертификат
 	certificate, _ = generateCertificate(privateKey)
-	// Print information about keys and certificate
-	fmt.Println("Private Key:")
-	fmt.Println(formatPrivateKey(privateKey))
-
-	fmt.Println("Public Key:")
-	fmt.Println(formatPublicKey(publicKey))
-
-	fmt.Println("Certificate:")
-	fmt.Println(formatCertificate(certificate))
 }
 
 // generatePrivateKey генерує приватний ключ RSA
@@ -664,6 +629,7 @@ func parsePublicKeyFromPEM(pemKey string) (*rsa.PublicKey, error) {
 	return publicKey, nil
 }
 
+// Считывание пароля с БД для сравнение с введенным пароле при скачивании приватного ключа
 func getPasswordFromDB(username string) (string, error) {
 	var password string
 	err := db.QueryRow("SELECT password FROM users WHERE username = ?", username).Scan(&password)
@@ -671,4 +637,13 @@ func getPasswordFromDB(username string) (string, error) {
 		return "", err
 	}
 	return password, nil
+}
+
+// получение ключей из БД
+func getKeysFromDB(username string) (privateKey, publicKey string, err error) {
+	err = db.QueryRow("SELECT private_key, public_key FROM users WHERE username = ?", username).Scan(&privateKey, &publicKey)
+	if err != nil {
+		return "", "", err
+	}
+	return privateKey, publicKey, nil
 }
