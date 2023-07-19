@@ -76,7 +76,9 @@ func main() {
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		username TEXT NOT NULL,
 		email TEXT NOT NULL,
-		password TEXT NOT NULL
+		password TEXT NOT NULL,
+		private_key TEXT, -- Поле для хранения приватного ключа в формате PEM
+		public_key TEXT -- Поле для хранения публичного ключа в формате PEM
 	)`)
 	if err != nil {
 		log.Fatal(err)
@@ -111,17 +113,31 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func downloadPrivateKeyHandler(w http.ResponseWriter, r *http.Request) {
+	// Получаем приватный ключ из базы данных для текущего пользователя
+	privateKey, err := getPrivateKeyFromDB(user.Username)
+	if err != nil {
+		http.Error(w, "Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Отправляем приватный ключ в виде файла для скачивания
 	w.Header().Set("Content-Disposition", "attachment; filename=private_key.pem")
 	w.Header().Set("Content-Type", "application/octet-stream")
-	pemKey := formatPrivateKey(privateKey)
-	http.ServeContent(w, r, "", time.Now(), bytes.NewReader([]byte(pemKey)))
+	http.ServeContent(w, r, "", time.Now(), bytes.NewReader([]byte(privateKey)))
 }
 
 func downloadPublicKeyHandler(w http.ResponseWriter, r *http.Request) {
+	// Получаем публичный ключ из базы данных для текущего пользователя
+	publicKey, err := getPublicKeyFromDB(user.Username)
+	if err != nil {
+		http.Error(w, "Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Отправляем публичный ключ в виде файла для скачивания
 	w.Header().Set("Content-Disposition", "attachment; filename=public_key.pem")
 	w.Header().Set("Content-Type", "application/octet-stream")
-	pemKey := formatPublicKey(publicKey)
-	http.ServeContent(w, r, "", time.Now(), bytes.NewReader([]byte(pemKey)))
+	http.ServeContent(w, r, "", time.Now(), bytes.NewReader([]byte(publicKey)))
 }
 
 func downloadSignedContractHandler(w http.ResponseWriter, r *http.Request) {
@@ -352,6 +368,16 @@ func generateKeysAndCertificate() {
 	publicKey = &privateKey.PublicKey
 	// Генерування самопідписаного сертифіката
 	certificate, _ = generateCertificate(privateKey)
+
+	// Форматируем приватный и публичный ключи в формат PEM
+	privateKeyPEM := formatPrivateKey(privateKey)
+	publicKeyPEM := formatPublicKey(publicKey)
+
+	// Сохраняем приватный и публичный ключи в базу данных для текущего пользователя
+	_, err := db.Exec("UPDATE users SET private_key = ?, public_key = ? WHERE username = ?", privateKeyPEM, publicKeyPEM, user.Username)
+	if err != nil {
+		fmt.Println("Не вдалося зберегти ключі в БД:", err)
+	}
 }
 
 // generatePrivateKey генерує приватний ключ RSA
@@ -515,4 +541,24 @@ func executePythonProgram(contractData []byte) (string, error) {
 	result = output.String()
 	// Возвращаем результат выполнения программы в виде строки
 	return output.String(), nil
+}
+
+// Функция для получения приватного ключа из базы данных для текущего пользователя
+func getPrivateKeyFromDB(username string) (string, error) {
+	var privateKey string
+	err := db.QueryRow("SELECT private_key FROM users WHERE username = ?", username).Scan(&privateKey)
+	if err != nil {
+		return "", err
+	}
+	return privateKey, nil
+}
+
+// Функция для получения публичного ключа из базы данных для текущего пользователя
+func getPublicKeyFromDB(username string) (string, error) {
+	var publicKey string
+	err := db.QueryRow("SELECT public_key FROM users WHERE username = ?", username).Scan(&publicKey)
+	if err != nil {
+		return "", err
+	}
+	return publicKey, nil
 }
