@@ -52,6 +52,7 @@ var (
 	certificate *x509.Certificate
 )
 
+var contractErors bool = true
 var db *sql.DB
 var user *User
 var result string = ""
@@ -112,11 +113,21 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, []string{"index.html"}, nil)
 }
 
+// getKeysFromDB retrieves the private and public keys from the database for the given username.
+func getKeysFromDB(username string) (privateKey, publicKey string, err error) {
+	err = db.QueryRow("SELECT private_key, public_key FROM users WHERE username = ?", username).Scan(&privateKey, &publicKey)
+	if err != nil {
+		return "", "", err
+	}
+	return privateKey, publicKey, nil
+}
+
 func downloadPrivateKeyHandler(w http.ResponseWriter, r *http.Request) {
 	// Получаем приватный ключ из базы данных для текущего пользователя
 	privateKey, err := getPrivateKeyFromDB(user.Username)
 	if err != nil {
-		http.Error(w, "Server Error", http.StatusInternalServerError)
+		//http.Error(w, "Server Error", http.StatusInternalServerError)
+		http.ServeContent(w, r, "", time.Now(), bytes.NewReader([]byte("Private key not found")))
 		return
 	}
 
@@ -130,7 +141,8 @@ func downloadPublicKeyHandler(w http.ResponseWriter, r *http.Request) {
 	// Получаем публичный ключ из базы данных для текущего пользователя
 	publicKey, err := getPublicKeyFromDB(user.Username)
 	if err != nil {
-		http.Error(w, "Server Error", http.StatusInternalServerError)
+		http.ServeContent(w, r, "", time.Now(), bytes.NewReader([]byte("Public key not found")))
+		//http.Error(w, "Server Error", http.StatusInternalServerError)
 		return
 	}
 
@@ -153,7 +165,11 @@ func downloadSignedContractHandler(w http.ResponseWriter, r *http.Request) {
 
 // ОТкрытие финальной страницы
 func finalHandler(w http.ResponseWriter, r *http.Request) {
-	renderTemplate(w, []string{"final.html"}, result)
+	if contractErors != true {
+		renderTemplate(w, []string{"final.html"}, result)
+	} else {
+		renderTemplate(w, []string{"main.html"}, user)
+	}
 }
 
 /**/
@@ -201,7 +217,10 @@ func contractHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Перевірка контракту перед підписанням
 	err = validateContract(contractData)
-	handleError("Неприпустимий контракт:", err)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	// Підписання контракту
 	signedContract, err := signContract(contractData)
@@ -226,6 +245,7 @@ func contractHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("Операції завершено успішно.")
 	handler = handler
+	contractErors = false
 }
 
 /*Регистрация*/
@@ -363,21 +383,50 @@ func renderTemplate(w http.ResponseWriter, tmplFiles []string, data interface{})
 
 // generateKeysAndCertificate генерує приватний ключ, публічний ключ і самопідписаний сертифікат
 func generateKeysAndCertificate() {
-	// Генерування приватного ключа
-	privateKey, _ = generatePrivateKey()
-	publicKey = &privateKey.PublicKey
-	// Генерування самопідписаного сертифіката
-	certificate, _ = generateCertificate(privateKey)
+	// generateKeysAndCertificate generates private and public keys, and a self-signed certificate.
+	privateKeyPEM, publicKeyPEM, err := getKeysFromDB(user.Username)
+	if err != nil || privateKeyPEM == "" || publicKeyPEM == "" {
+		// If keys are missing in the database, generate new ones
+		privateKey, _ = generatePrivateKey()
+		publicKey := &privateKey.PublicKey
 
-	// Форматируем приватный и публичный ключи в формат PEM
-	privateKeyPEM := formatPrivateKey(privateKey)
-	publicKeyPEM := formatPublicKey(publicKey)
+		// Format private and public keys to PEM format
+		privateKeyPEM = formatPrivateKey(privateKey)
+		publicKeyPEM = formatPublicKey(publicKey)
 
-	// Сохраняем приватный и публичный ключи в базу данных для текущего пользователя
-	_, err := db.Exec("UPDATE users SET private_key = ?, public_key = ? WHERE username = ?", privateKeyPEM, publicKeyPEM, user.Username)
-	if err != nil {
-		fmt.Println("Не вдалося зберегти ключі в БД:", err)
+		// Save private and public keys to the database for the current user
+		_, err = db.Exec("UPDATE users SET private_key = ?, public_key = ? WHERE username = ?", privateKeyPEM, publicKeyPEM, user.Username)
+		if err != nil {
+			fmt.Println("Failed to save keys to the database:", err)
+			return
+		}
 	}
+
+	// Parse private key from PEM format
+	privateKey, err = parsePrivateKeyFromPEM(privateKeyPEM)
+	if err != nil {
+		fmt.Println("Failed to parse private key:", err)
+		return
+	}
+
+	// Parse public key from PEM format
+	publicKey, err = parsePublicKeyFromPEM(publicKeyPEM)
+	if err != nil {
+		fmt.Println("Failed to parse public key:", err)
+		return
+	}
+
+	// Generate self-signed certificate
+	certificate, _ = generateCertificate(privateKey)
+	// Print information about keys and certificate
+	fmt.Println("Private Key:")
+	fmt.Println(formatPrivateKey(privateKey))
+
+	fmt.Println("Public Key:")
+	fmt.Println(formatPublicKey(publicKey))
+
+	fmt.Println("Certificate:")
+	fmt.Println(formatCertificate(certificate))
 }
 
 // generatePrivateKey генерує приватний ключ RSA
@@ -560,5 +609,35 @@ func getPublicKeyFromDB(username string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	return publicKey, nil
+}
+
+// parsePrivateKeyFromPEM parses the private key from PEM format and returns an *rsa.PrivateKey.
+func parsePrivateKeyFromPEM(pemKey string) (*rsa.PrivateKey, error) {
+	block, _ := pem.Decode([]byte(pemKey))
+	if block == nil || block.Type != "RSA PRIVATE KEY" {
+		return nil, errors.New("failed to decode PEM block containing private key")
+	}
+
+	privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return privateKey, nil
+}
+
+// parsePublicKeyFromPEM parses the public key from PEM format and returns an *rsa.PublicKey.
+func parsePublicKeyFromPEM(pemKey string) (*rsa.PublicKey, error) {
+	block, _ := pem.Decode([]byte(pemKey))
+	if block == nil || block.Type != "PUBLIC KEY" {
+		return nil, errors.New("failed to decode PEM block containing public key")
+	}
+
+	publicKey, err := x509.ParsePKCS1PublicKey(block.Bytes)
+	if err != nil {
+		return nil, err
+	}
+
 	return publicKey, nil
 }
