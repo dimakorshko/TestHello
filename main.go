@@ -96,7 +96,7 @@ func main() {
 	http.HandleFunc("/profile", profileHandler)
 	http.HandleFunc("/signContract", contractHandler)
 	http.HandleFunc("/final", finalHandler)
-	http.HandleFunc("/downloadPrivateKey", downloadPrivateKeyHandler)
+	//http.HandleFunc("/downloadPrivateKey", downloadPrivateKeyHandler)
 	http.HandleFunc("/downloadPublicKey", downloadPublicKeyHandler)
 	http.HandleFunc("/downloadSignedContract", downloadSignedContractHandler)
 
@@ -122,40 +122,42 @@ func getKeysFromDB(username string) (privateKey, publicKey string, err error) {
 	return privateKey, publicKey, nil
 }
 
-func downloadPrivateKeyHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
-		// Получаем приватный ключ из базы данных для текущего пользователя
-		password := r.FormValue("password")
+/*
+	func downloadPrivateKeyHandler(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "POST" {
+			// Получаем приватный ключ из базы данных для текущего пользователя
+			password := r.FormValue("password")
 
-		// Получаем пароль из базы данных для текущего пользователя
-		correctPassword, err := getPasswordFromDB(user.Username)
-		fmt.Println(correctPassword)
-		fmt.Println("A")
-		fmt.Println(password)
-		if err != nil {
-			http.Error(w, "Server Error", http.StatusInternalServerError)
-			return
+			// Получаем пароль из базы данных для текущего пользователя
+			correctPassword, err := getPasswordFromDB(user.Username)
+			fmt.Println(correctPassword)
+			fmt.Println("A")
+			fmt.Println(password)
+			if err != nil {
+				http.Error(w, "Server Error", http.StatusInternalServerError)
+				return
+			}
+
+			// Сверяем введенный пароль с паролем из базы данных
+			if password != correctPassword {
+				http.Error(w, "Неправильний пароль", http.StatusUnauthorized)
+				return
+			}
+
+			privateKey, err := getPrivateKeyFromDB(user.Username)
+			if err != nil {
+				//http.Error(w, "Server Error", http.StatusInternalServerError)
+				http.ServeContent(w, r, "", time.Now(), bytes.NewReader([]byte("Private key not found")))
+				return
+			}
+
+			// Отправляем приватный ключ в виде файла для скачивания
+			w.Header().Set("Content-Disposition", "attachment; filename=private_key.pem")
+			w.Header().Set("Content-Type", "application/octet-stream")
+			http.ServeContent(w, r, "", time.Now(), bytes.NewReader([]byte(privateKey)))
 		}
-
-		// Сверяем введенный пароль с паролем из базы данных
-		if password != correctPassword {
-			http.Error(w, "Неправильний пароль", http.StatusUnauthorized)
-			return
-		}
-
-		privateKey, err := getPrivateKeyFromDB(user.Username)
-		if err != nil {
-			//http.Error(w, "Server Error", http.StatusInternalServerError)
-			http.ServeContent(w, r, "", time.Now(), bytes.NewReader([]byte("Private key not found")))
-			return
-		}
-
-		// Отправляем приватный ключ в виде файла для скачивания
-		w.Header().Set("Content-Disposition", "attachment; filename=private_key.pem")
-		w.Header().Set("Content-Type", "application/octet-stream")
-		http.ServeContent(w, r, "", time.Now(), bytes.NewReader([]byte(privateKey)))
 	}
-}
+*/
 func downloadPublicKeyHandler(w http.ResponseWriter, r *http.Request) {
 	// Получаем публичный ключ из базы данных для текущего пользователя
 	publicKey, err := getPublicKeyFromDB(user.Username)
