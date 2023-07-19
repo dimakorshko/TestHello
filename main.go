@@ -197,6 +197,7 @@ func finalHandler(w http.ResponseWriter, r *http.Request) {
 /*Подпись контракта*/
 /**/
 func contractHandler(w http.ResponseWriter, r *http.Request) {
+	contractErors = true
 	generateKeysAndCertificate()
 	//printKeysAndCertificate()
 
