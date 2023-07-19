@@ -5,6 +5,11 @@
 
 *{
     box-sizing: border-box;
+    list-style: none;
+    text-decoration: none;
+    font-family: 'Poppins', sans-serif;
+    padding: 0;
+    margin: 0;
 }
 
 
@@ -239,12 +244,20 @@ form__btn_signup{
 
 
 
-/* /*ФІНАЛЬНА СТОРІНКА */
+/*ФІНАЛЬНА СТОРІНКА */
+
+.diva-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
 
 .diva {
     width: 50%;
     height: 50%;
-    position: absolute;
+    position: fixed;
     box-sizing: border-box;
     background-color: white;
     transition: background-color 0.3s;
@@ -281,6 +294,7 @@ form__btn_signup{
   
 
   .btn_fin{
+    text-align: center;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -297,12 +311,12 @@ form__btn_signup{
     font-size: 24px;
     color: #fff;
     font-weight: bold;
-    
+    line-height: 40px;
 }
 
 .diva h1 {
     position: absolute;
-    top: 0;
+    top: 70px;
     left: 0;
     width: 100%;
     text-align: center;
@@ -319,37 +333,138 @@ form__btn_signup{
     left: 40%;
 }
 
-.img_div{
+.diva p{
     position: absolute;
-    width: 100%;
-    height: 10%;
+    top: 50%;
+    left: 50%;
 }
 
 /* PROFILE */
-
-.profile-icon {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-  }
-
-.profile-title {
-    top: 0;
-    left:0;
+.div_pass {
+    width: 50%;
+    height: 50%;
+    position: absolute;
+    box-sizing: border-box;
+    background-color: white;
+    transition: background-color 0.3s;
     text-align: center;
-    font-size: 40px;
-    margin-top: 100px;
+    
+    font-size: 1rem;
+    color: #000;
+    font-family: 'Open Sans', sans-serif;
+   
 }
 
-.profile-label {
-    margin-left: 50px;
-    font-size: 30px;
+.div_pass:nth-child(1) {
+    text-align: center;
+    bottom: 0;
+    right: 0;
 }
 
+.div_pass:nth-child(2) {
+    text-align: center;
+    bottom: 0;
+    left: 0;
+}
+.div_pass:hover {
+background-color: gray;
+}
 
+.div_pass:hover button {
+background-color: white;
+color: black;
+}
+
+.btn_fin1{
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+padding: 10px 20px;
+
+background-color: #7E7E7E;
+height: 60px;
+width: 240px;
+box-shadow: 0 5px 45px rgba(0, 0, 0, 0.25);
+
+border: none;
+border-radius: 5px;
+font-size: 24px;
+color: #fff;
+font-weight: bold;
+}
+
+.info {
+    position: fixed;
+    text-align: center;
+    top: 0;
+    height: 50%;
+    width: 100%;
+    background-color: #fff;
+}
+  
+
+.profile{
+    padding: 70px;
+    text-align: center;
+    font-size: 3.5rem;
+    color: #000;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.profile_label{ 
+    text-align: center;
+    font-size: 1.5rem;
+    color: #000;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.pass{
+position: absolute;
+width: 20%;
+padding: 10px;
+border: solid 1px #333;
+font-size: inherit;
+position: absolute;
+top: 70%;
+left: 39%;
+}
+
+/* MENU */
+
+.header1{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 8%;
+    box-shadow: 0 5px 10px #7E7E7E; 
+    width: 100%;
+    z-index: 9999;
+}
+
+header nav ul li{
+    position: relative;
+    float: left;
+}
+
+header nav ul li a{
+    padding: 15px;
+    color: #000;
+    font-size: 16px;
+    display: block;
+    transition: 0.5s;
+}
+
+header nav ul li a:hover{
+    transform: scale(1.1);
+    background-color: #000;
+    color: #fff;
+}
 
     
 /* Адаптив */

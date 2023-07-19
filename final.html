@@ -8,26 +8,37 @@
     <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
-    <div class="diva">
-        <h1>Приватний ключ</h1>
-        <form method="POST" action="/downloadPrivateKey"> <!-- Исправленный атрибут action -->
-            <button type="submit" class="btn_fin" onclick="showPasswordField()">Завантажити</button>
-            <input class="pass" type="password" id="password" class="form__input" placeholder="Пароль" name="password" required> <!-- Исправленный идентификатор -->
-        </form> 
-       <!-- <h1>Приватний ключ</h1>
-        <a class="btn_fin" href="/downloadPrivateKey" download>Завантажити</a>-->
-    </div>
-    <div class="diva">
-        <h1>Підписаний контракт</h1>
-        <a class="btn_fin" href="/downloadSignedContract" download>Завантажити</a>
-    </div>
-    <div class="diva">
-        <h1>Публічний ключ</h1>
-        <a class="btn_fin" href="/downloadPublicKey" download>Завантажити</a>
-    </div>
-    <div class="diva">
-        <h1>Результати виконання програми</h1>
-		<p>{{.}}</p>
+    <header class="header1">
+        <nav>
+          <ul>
+            <li><a href="profile.html">Профіль</a></li>
+            <li><a href="main.html">Підписати контракт</a></li>
+            <li><a href="index.html">Вийти</a></li>
+          </ul>
+        </nav>
+      </header>
+    <div class="diva-container">
+        <div class="diva">
+            <h1>Приватний ключ</h1>
+            <form method="POST" action="/downloadPrivateKey"> <!-- Исправленный атрибут action -->
+                <button type="submit" class="btn_fin" onclick="showPasswordField()">Завантажити</button>
+                <input class="pass" type="password" id="password" class="form__input" placeholder="Пароль" name="password" required> <!-- Исправленный идентификатор -->
+            </form> 
+        <!-- <h1>Приватний ключ</h1>
+            <a class="btn_fin" href="/downloadPrivateKey" download>Завантажити</a>-->
+        </div>
+        <div class="diva">
+            <h1>Підписаний контракт</h1>
+            <a class="btn_fin" href="/downloadSignedContract" download>Завантажити</a>
+        </div>
+        <div class="diva">
+            <h1>Публічний ключ</h1>
+            <a class="btn_fin" href="/downloadPublicKey" download>Завантажити</a>
+        </div>
+        <div class="diva">
+            <h1>Результати виконання програми</h1>
+            <p>{{.}}</p>
+        </div>
     </div>
     <script>
         function showPasswordField() {
