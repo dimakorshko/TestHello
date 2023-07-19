@@ -93,6 +93,9 @@ func main() {
 	http.HandleFunc("/profile", profileHandler)
 	http.HandleFunc("/signContract", contractHandler)
 	http.HandleFunc("/final", finalHandler)
+	http.HandleFunc("/downloadPrivateKey", downloadPrivateKeyHandler)
+	http.HandleFunc("/downloadPublicKey", downloadPublicKeyHandler)
+	http.HandleFunc("/downloadSignedContract", downloadSignedContractHandler)
 
 	log.Println("Server started on http://localhost:443")
 
@@ -107,6 +110,32 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, []string{"index.html"}, nil)
 }
 
+func downloadPrivateKeyHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Disposition", "attachment; filename=private_key.pem")
+	w.Header().Set("Content-Type", "application/octet-stream")
+	pemKey := formatPrivateKey(privateKey)
+	http.ServeContent(w, r, "", time.Now(), bytes.NewReader([]byte(pemKey)))
+}
+
+func downloadPublicKeyHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Disposition", "attachment; filename=public_key.pem")
+	w.Header().Set("Content-Type", "application/octet-stream")
+	pemKey := formatPublicKey(publicKey)
+	http.ServeContent(w, r, "", time.Now(), bytes.NewReader([]byte(pemKey)))
+}
+
+func downloadSignedContractHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Disposition", "attachment; filename=signed_contract.p7s")
+	w.Header().Set("Content-Type", "application/octet-stream")
+	signedContract, err := ioutil.ReadFile("signed_contract.p7s")
+	if err != nil {
+		http.Error(w, "Server Error", http.StatusInternalServerError)
+		return
+	}
+	http.ServeContent(w, r, "", time.Now(), bytes.NewReader(signedContract))
+}
+
+// ОТкрытие финальной страницы
 func finalHandler(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, []string{"final.html"}, result)
 }

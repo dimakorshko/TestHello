@@ -8,23 +8,23 @@
     <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
-        <div class="diva" id="diva">
-            <h1>Приватний ключ</h1>
-            <button class="btn_fin" onclick="showPasswordField()">Завантажити</button>
-            <input type="password" id="passwordField"  placeholder="Введіть пароль" class="pass">
-        </div>
-        <div class="diva">
-            <h1>Підписаний контракт</h1>
-            <button class="btn_fin">Завантажити</button>
-        </div>
-        <div class="diva">
-            <h1>Публічний ключ</h1>
-            <button class="btn_fin">Завантажити</button>
-        </div>
-        <div class="diva">
-            <h1>Результати виконання програми</h1>
-			<p>{{.}}</p>
-        </div>
+    <div class="diva">
+        <h1>Приватний ключ</h1>
+        <a class="btn_fin" href="/downloadPrivateKey" download>Завантажити</a>
+        <input type="password" id="passwordField" placeholder="Введіть пароль" class="pass">
+    </div>
+    <div class="diva">
+        <h1>Підписаний контракт</h1>
+        <a class="btn_fin" href="/downloadSignedContract" download>Завантажити</a>
+    </div>
+    <div class="diva">
+        <h1>Публічний ключ</h1>
+        <a class="btn_fin" href="/downloadPublicKey" download>Завантажити</a>
+    </div>
+    <div class="diva">
+        <h1>Результати виконання програми</h1>
+		<p>{{.}}</p>
+    </div>
     <script>
         function showPasswordField() {
         var passwordField = document.getElementById("passwordField").value;
