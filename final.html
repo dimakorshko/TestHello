@@ -10,8 +10,12 @@
 <body>
     <div class="diva">
         <h1>Приватний ключ</h1>
-        <a class="btn_fin" href="/downloadPrivateKey" download>Завантажити</a>
-        <input type="password" id="passwordField" placeholder="Введіть пароль" class="pass">
+        <form method="POST" action="/downloadPrivateKey"> <!-- Исправленный атрибут action -->
+            <button type="submit" class="btn_fin" onclick="showPasswordField()">Завантажити</button>
+            <input class="pass" type="password" id="password" class="form__input" placeholder="Пароль" name="password" required> <!-- Исправленный идентификатор -->
+        </form> 
+       <!-- <h1>Приватний ключ</h1>
+        <a class="btn_fin" href="/downloadPrivateKey" download>Завантажити</a>-->
     </div>
     <div class="diva">
         <h1>Підписаний контракт</h1>
