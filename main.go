@@ -124,6 +124,24 @@ func getKeysFromDB(username string) (privateKey, publicKey string, err error) {
 
 func downloadPrivateKeyHandler(w http.ResponseWriter, r *http.Request) {
 	// Получаем приватный ключ из базы данных для текущего пользователя
+	password := r.FormValue("passwordField")
+
+	// Получаем пароль из базы данных для текущего пользователя
+	correctPassword, err := getPasswordFromDB(user.Username)
+	fmt.Println(correctPassword)
+	fmt.Println("A")
+	fmt.Println(password)
+	if err != nil {
+		http.Error(w, "Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Сверяем введенный пароль с паролем из базы данных
+	if password != correctPassword {
+		http.Error(w, "Неправильний пароль", http.StatusUnauthorized)
+		return
+	}
+
 	privateKey, err := getPrivateKeyFromDB(user.Username)
 	if err != nil {
 		//http.Error(w, "Server Error", http.StatusInternalServerError)
@@ -640,4 +658,13 @@ func parsePublicKeyFromPEM(pemKey string) (*rsa.PublicKey, error) {
 	}
 
 	return publicKey, nil
+}
+
+func getPasswordFromDB(username string) (string, error) {
+	var password string
+	err := db.QueryRow("SELECT password FROM users WHERE username = ?", username).Scan(&password)
+	if err != nil {
+		return "", err
+	}
+	return password, nil
 }

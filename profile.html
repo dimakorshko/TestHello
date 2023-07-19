@@ -154,8 +154,10 @@
         </div>
         <div class="div_pass" id="div_pass">
             <h1>Приватний ключ</h1>
-            <a href="/downloadPrivateKey" class="btn btn-primary"><button class="btn_fin" onclick="showPasswordField()">Завантажити</button></a>    
-            <input type="password" id="passwordField"  placeholder="Введіть пароль" class="pass">
+            <form action="downloadPrivateKey">
+              <a class="btn btn-primary"><button type="submit" class="btn_fin" onclick="showPasswordField()">Завантажити</button></a>    
+              <input type="password" id="passwordField"  placeholder="Введіть пароль" class="pass">
+            </form>
         </div>
     </div>
     <script>
